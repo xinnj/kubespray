@@ -9,7 +9,8 @@ calico_ipv4pool_ipip: "Off"
 # Use IP-over-IP encapsulation across hosts
 ipip: true
 ipip_mode: "{{ 'Always' if ipip else 'Never' }}"  # change to "CrossSubnet" if you only want ipip encapsulation on traffic going across subnets
-calico_ipip_mode: "{{ ipip_mode }}"
+# calico_ipip_mode: "{{ ipip_mode }}"
+calico_ipip_mode: "CrossSubnet"
 calico_vxlan_mode: 'Never'
 
 calico_ipip_mode_ipv6: Never
@@ -65,7 +66,7 @@ calico_healthhost: "localhost"
 calico_iptables_lock_timeout_secs: 10
 
 # Choose Calico iptables backend: "Legacy", "Auto" or "NFT" (FELIX_IPTABLESBACKEND)
-calico_iptables_backend: "Legacy"
+calico_iptables_backend: "Auto"
 
 # If you want to use non default IP_AUTODETECTION_METHOD for calico node set this option to one of:
 # * can-reach=DESTINATION
