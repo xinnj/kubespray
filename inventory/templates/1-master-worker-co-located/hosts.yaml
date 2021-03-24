@@ -1,0 +1,20 @@
+all:
+  hosts:
+    master-1:
+      ansible_host: 10.184.101.240
+  children:
+    kube-master:
+      hosts:
+        master-1:
+    kube-node:
+      hosts:
+        master-1:
+    etcd:
+      hosts:
+        master-1:
+    k8s-cluster:
+      children:
+        kube-master:
+        kube-node:
+    calico-rr:
+      hosts: {}

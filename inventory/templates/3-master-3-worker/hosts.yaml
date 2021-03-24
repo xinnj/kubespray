@@ -1,0 +1,30 @@
+all:
+  hosts:
+    master-1:
+      ansible_host: 10.184.101.240
+    master-2:
+      ansible_host: 10.184.101.241
+    master-3:
+      ansible_host: 10.184.101.242
+    worker-1:
+      ansible_host: 10.184.101.243
+  children:
+    kube-master:
+      hosts:
+        master-1:
+        master-2:
+        master-3:
+    kube-node:
+      hosts:
+        worker-1:
+    etcd:
+      hosts:
+        master-1:
+        master-2:
+        master-3:
+    k8s-cluster:
+      children:
+        kube-master:
+        kube-node:
+    calico-rr:
+      hosts: {}
