@@ -93,3 +93,4 @@
     name: "{{ ( (ansible_distribution_major_version | int) < 8) | ternary('libselinux-python','python3-libselinux') }}"
     state: present
   become: true
+  when: (ansible_distribution_version | float) < 8.0

@@ -1,0 +1,32 @@
+---
+- hosts: localhost
+  gather_facts: false
+  tasks:
+#    - name: Clean artifact path
+#      file:
+#        state: absent
+#        path: /tmp/kubespray_cache
+    - name: Copy cached files
+      copy:
+        src: ../kubespray_cache
+        dest: /tmp/
+
+- hosts: k8s-cluster
+  gather_facts: false
+  tasks:
+#    - name: Clean artifact path
+#      file:
+#        state: absent
+#        path: /tmp/required_pkgs
+    - name: Copy required packages
+      copy:
+        src: ../required_pkgs
+        dest: /tmp/
+#    - name: Clean artifact path
+#      file:
+#        state: absent
+#        path: /tmp/docker
+    - name: Copy docker packages
+      copy:
+        src: ../docker
+        dest: /tmp/

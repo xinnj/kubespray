@@ -24,6 +24,7 @@
   changed_when: False
   register: system_nameservers
   check_mode: no
+  ignore_errors: yes
 
 - name: check system search domains
   # noqa 306 - if resolf.conf has no search domain, grep will exit 1 which would force us to add failed_when: false
