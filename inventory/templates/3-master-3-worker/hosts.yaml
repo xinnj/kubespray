@@ -1,27 +1,33 @@
 all:
   hosts:
-    master-1:
+    localhost:
+      ansible_connection: local
+      ssh_key_filename: "surpass_rsa"
+      remote_machine_username: "root"
+      remote_machine_password: "Root"
+    surpass-master-1:
       ansible_host: 10.184.101.240
-    master-2:
+      ansible_port: 22
+    surpass-master-2:
       ansible_host: 10.184.101.241
-    master-3:
+      ansible_port: 22
+    surpass-master-3:
       ansible_host: 10.184.101.242
-    worker-1:
+      ansible_port: 22
+    surpass-worker-1:
       ansible_host: 10.184.101.243
+      ansible_port: 22
   children:
     kube-master:
       hosts:
-        master-1:
-        master-2:
-        master-3:
+        surpass-master-1:
+        surpass-master-2:
+        surpass-master-3:
     kube-node:
       hosts:
-        worker-1:
+        surpass-worker-1:
     etcd:
-      hosts:
-        master-1:
-        master-2:
-        master-3:
+      hosts: {}
     k8s-cluster:
       children:
         kube-master:
