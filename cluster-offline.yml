@@ -2,14 +2,14 @@
 - name: Check ansible version
   import_playbook: ansible_version.yml
 
-#- name: Copy ssh key to cluster nodes
-#  import_playbook: passwordless.yml
-#
-#- name: Prepare offline files
-#  import_playbook: prepare-offline-files.yml
-#
-#- name: Disable firewall
-#  import_playbook: disable-firewall.yml
+- name: Copy ssh key to cluster nodes
+  import_playbook: passwordless.yml
+
+- name: Prepare offline files
+  import_playbook: prepare-offline-files.yml
+
+- name: Disable firewall
+  import_playbook: disable-firewall.yml
 
 - hosts: bastion[0]
   gather_facts: False
