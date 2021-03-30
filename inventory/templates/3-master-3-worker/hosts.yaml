@@ -23,9 +23,19 @@ all:
         surpass-master-1:
         surpass-master-2:
         surpass-master-3:
-    kube-node:
+    om:
+      hosts:
+        surpass-master-3:
+    sg1:
+      vars:
+        node_labels:
+          sg.surpass: sg1
       hosts:
         surpass-worker-1:
+    kube-node:
+      children:
+        om:
+        sg1:
     etcd:
       hosts: {}
     k8s-cluster:

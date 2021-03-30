@@ -12,9 +12,19 @@ all:
     kube-master:
       hosts:
         devops:
-    kube-node:
+    om:
       hosts:
         devops:
+    sg1:
+      vars:
+        node_labels:
+          sg.surpass: sg1
+      hosts:
+        devops:
+    kube-node:
+      children:
+        om:
+        sg1:
     etcd:
       hosts: {}
     k8s-cluster:
