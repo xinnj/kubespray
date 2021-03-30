@@ -71,7 +71,7 @@
 
 - name: Install packages requirements offline on Centos
   shell:
-    cmd: yum install --disablerepo='*' -y *.rpm
+    cmd: yum install --disablerepo='*' --allowerasing -y *.rpm
     chdir: /tmp/required_pkgs/
   when:
     - ansible_pkg_mgr in ['yum', 'dnf']

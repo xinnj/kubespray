@@ -1,17 +1,22 @@
 all:
   hosts:
-    master-1:
-      ansible_host: 10.184.101.240
+    localhost:
+      ansible_connection: local
+      ssh_key_filename: "surpass_rsa"
+      remote_machine_username: "root"
+      remote_machine_password: "Root"
+    devops:
+      ansible_host: 10.184.101.239
+      ansible_port: 22
   children:
     kube-master:
       hosts:
-        master-1:
+        devops:
     kube-node:
       hosts:
-        master-1:
+        devops:
     etcd:
-      hosts:
-        master-1:
+      hosts: {}
     k8s-cluster:
       children:
         kube-master:

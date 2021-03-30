@@ -123,14 +123,14 @@
 #    - not is_ostree
 #    - docker_package_info.pkgs|length > 0
 
-- name: Remove old docker
-  shell:
-    cmd: yum erase -y docker-ce
-  when: ansible_pkg_mgr in ['yum', 'dnf']
+#- name: Remove old docker
+#  shell:
+#    cmd: yum erase -y docker-ce
+#  when: ansible_pkg_mgr in ['yum', 'dnf']
 
 - name: Install docker offline
   shell:
-    cmd: yum install --disablerepo='*' -y *.rpm
+    cmd: yum install --disablerepo='*' --allowerasing -y *.rpm
     chdir: /tmp/docker/
   notify: restart docker
   when: ansible_pkg_mgr in ['yum', 'dnf']
