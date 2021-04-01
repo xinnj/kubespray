@@ -1,0 +1,7 @@
+---
+
+external_domain_name: "www.test.com"
+prometheus_stack_namespace: "monitoring"
+prometheus_stack_nodeselector:
+  om.surpass: true
+

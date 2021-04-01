@@ -22,7 +22,7 @@ metrics_server_enabled: true
 local_path_provisioner_enabled: true
 # local_path_provisioner_namespace: "local-path-storage"
 # local_path_provisioner_storage_class: "local-path"
-local_path_provisioner_reclaim_policy: Retain
+local_path_provisioner_reclaim_policy: Delete
 local_path_provisioner_claim_root: /home/data/
 # local_path_provisioner_debug: false
 # local_path_provisioner_image_repo: "rancher/local-path-provisioner"
@@ -173,3 +173,6 @@ metallb_enabled: false
 #   - peer_address: 192.0.2.2
 #     peer_asn: 64513
 #     my_asn: 4200000000
+
+# Prometheus stack deployment
+prometheus_stack_enabled: true

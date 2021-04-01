@@ -82,6 +82,10 @@ multus_version: "v3.6"
 ovn4nfv_ovn_image_version: "v1.0.0"
 ovn4nfv_k8s_plugin_image_version: "v1.1.0"
 helm_version: "v3.5.2"
+prometheus_stack_chart_version: "14.4.0"
+prometheus_node_exporter_chart_version: "1.16.2"
+kube_state_metrics_chart_version: "2.13.1"
+grafana_chart_version: "6.6.4"
 
 # Get kubernetes major version (i.e. 1.17.4 => 1.17)
 kube_major_version: "{{ kube_version | regex_replace('^v([0-9])+\\.([0-9]+)\\.[0-9]+', 'v\\1.\\2') }}"
@@ -100,6 +104,10 @@ cni_download_url: "https://github.com/containernetworking/plugins/releases/downl
 calicoctl_download_url: "https://github.com/projectcalico/calicoctl/releases/download/{{ calico_ctl_version }}/calicoctl-linux-{{ image_arch }}"
 crictl_download_url: "https://github.com/kubernetes-sigs/cri-tools/releases/download/{{ crictl_version }}/crictl-{{ crictl_version }}-{{ ansible_system | lower }}-{{ image_arch }}.tar.gz"
 helm_download_url: "https://get.helm.sh/helm-{{ helm_version }}-linux-{{ image_arch }}.tar.gz"
+prometheus_stack_chart_download_url: "https://github.com/prometheus-community/helm-charts/releases/download/kube-prometheus-stack-{{ prometheus_stack_chart_version }}/kube-prometheus-stack-{{ prometheus_stack_chart_version }}.tgz"
+prometheus_node_exporter_chart_download_url: "https://github.com/prometheus-community/helm-charts/releases/download/prometheus-node-exporter-{{ prometheus_node_exporter_chart_version }}/prometheus-node-exporter-{{ prometheus_node_exporter_chart_version }}.tgz"
+kube_state_metrics_chart_download_url: "https://github.com/kubernetes/kube-state-metrics/releases/download/kube-state-metrics-helm-chart-{{ kube_state_metrics_chart_version }}/kube-state-metrics-{{ kube_state_metrics_chart_version }}.tgz"
+grafana_chart_download_url: "https://github.com/grafana/helm-charts/releases/download/grafana-{{ grafana_chart_version }}/grafana-{{ grafana_chart_version }}.tgz"
 
 crictl_checksums:
   arm:
@@ -594,6 +602,28 @@ dashboard_metrics_scraper_tag: "v1.0.6"
 
 metallb_speaker_image_repo: "{{ quay_image_repo }}/metallb/speaker"
 metallb_controller_image_repo: "{{ quay_image_repo }}/metallb/controller"
+
+# prometheus stack
+alertmanager_image_repo: "{{ quay_image_repo }}/prometheus/alertmanager"
+alertmanager_image_tag: "v0.21.0"
+kube_webhook_certgen_image_repo: "{{ docker_image_repo }}/jettech/kube-webhook-certgen"
+kube_webhook_certgen_image_tag: "v1.5.0"
+prometheus_operator_image_repo: "{{ quay_image_repo }}/prometheus-operator/prometheus-operator"
+prometheus_operator_image_tag: "v0.46.0"
+prometheus_config_reloader_image_repo: "{{ quay_image_repo }}/prometheus-operator/prometheus-config-reloader"
+prometheus_config_reloader_image_tag: "v0.46.0"
+prometheus_image_repo: "{{ quay_image_repo }}/prometheus/prometheus"
+prometheus_image_tag: "v2.24.0"
+grafana_image_repo: "{{ docker_image_repo }}/grafana/grafana"
+grafana_image_tag: "7.4.5"
+curl_image_repo: "{{ docker_image_repo }}/curlimages/curl"
+curl_image_tag: "7.73.0"
+busybox_image_repo: "{{ docker_image_repo }}/library/busybox"
+busybox_image_tag: "1.31.1"
+k8s_sidecar_image_repo: "{{ quay_image_repo }}/kiwigrid/k8s-sidecar"
+k8s_sidecar_image_tag: "1.10.7"
+kube_state_metrics_image_repo: "{{ kube_image_repo }}/kube-state-metrics/kube-state-metrics"
+kube_state_metrics_image_tag: "v1.9.8"
 
 downloads:
   netcheck_server:
@@ -1135,6 +1165,144 @@ downloads:
     sha256: "{{ dashboard_digest_checksum|default(None) }}"
     groups:
     - kube-master
+
+  alertmanager:
+    enabled: "{{ prometheus_stack_enabled }}"
+    container: true
+    repo: "{{ alertmanager_image_repo }}"
+    tag: "{{ alertmanager_image_tag }}"
+    sha256: "{{ alertmanager_digest_checksum|default(None) }}"
+    groups:
+    - kube-node
+
+  kube_webhook_certgen:
+    enabled: "{{ prometheus_stack_enabled }}"
+    container: true
+    repo: "{{ kube_webhook_certgen_image_repo }}"
+    tag: "{{ kube_webhook_certgen_image_tag }}"
+    sha256: "{{ kube_webhook_certgen_digest_checksum|default(None) }}"
+    groups:
+    - kube-node
+
+  prometheus_operator:
+    enabled: "{{ prometheus_stack_enabled }}"
+    container: true
+    repo: "{{ prometheus_operator_image_repo }}"
+    tag: "{{ prometheus_operator_image_tag }}"
+    sha256: "{{ prometheus_operator_digest_checksum|default(None) }}"
+    groups:
+    - kube-node
+
+  prometheus_config_reloader:
+    enabled: "{{ prometheus_stack_enabled }}"
+    container: true
+    repo: "{{ prometheus_config_reloader_image_repo }}"
+    tag: "{{ prometheus_config_reloader_image_tag }}"
+    sha256: "{{ prometheus_config_reloader_digest_checksum|default(None) }}"
+    groups:
+    - kube-node
+
+  prometheus:
+    enabled: "{{ prometheus_stack_enabled }}"
+    container: true
+    repo: "{{ prometheus_image_repo }}"
+    tag: "{{ prometheus_image_tag }}"
+    sha256: "{{ prometheus_digest_checksum|default(None) }}"
+    groups:
+    - kube-node
+
+  grafana:
+    enabled: "{{ prometheus_stack_enabled }}"
+    container: true
+    repo: "{{ grafana_image_repo }}"
+    tag: "{{ grafana_image_tag }}"
+    sha256: "{{ grafana_digest_checksum|default(None) }}"
+    groups:
+    - kube-node
+
+  curl:
+    enabled: "{{ prometheus_stack_enabled }}"
+    container: true
+    repo: "{{ curl_image_repo }}"
+    tag: "{{ curl_image_tag }}"
+    sha256: "{{ curl_digest_checksum|default(None) }}"
+    groups:
+    - kube-node
+
+  busybox:
+    enabled: "{{ prometheus_stack_enabled }}"
+    container: true
+    repo: "{{ busybox_image_repo }}"
+    tag: "{{ busybox_image_tag }}"
+    sha256: "{{ busybox_digest_checksum|default(None) }}"
+    groups:
+    - kube-node
+
+  k8s_sidecar:
+    enabled: "{{ prometheus_stack_enabled }}"
+    container: true
+    repo: "{{ k8s_sidecar_image_repo }}"
+    tag: "{{ k8s_sidecar_image_tag }}"
+    sha256: "{{ k8s_sidecar_digest_checksum|default(None) }}"
+    groups:
+    - kube-node
+
+  kube_state_metrics:
+    enabled: "{{ prometheus_stack_enabled }}"
+    container: true
+    repo: "{{ kube_state_metrics_image_repo }}"
+    tag: "{{ kube_state_metrics_image_tag }}"
+    sha256: "{{ kube_state_metrics_digest_checksum|default(None) }}"
+    groups:
+    - kube-node
+
+  prometheus_stack_chart:
+    enabled: "{{ prometheus_stack_enabled }}"
+    file: true
+    version: "{{ prometheus_stack_chart_version }}"
+    dest: "{{local_release_dir}}/charts/kube-prometheus-stack-{{ prometheus_stack_chart_version }}.tgz"
+    url: "{{ prometheus_stack_chart_download_url }}"
+    unarchive: true
+    owner: "root"
+    mode: "0755"
+    groups:
+    - kube-master[0]
+
+  prometheus_node_exporter_chart:
+    enabled: "{{ prometheus_stack_enabled }}"
+    file: true
+    version: "{{ prometheus_node_exporter_chart_version }}"
+    dest: "{{local_release_dir}}/charts/prometheus-node-exporter-{{ prometheus_node_exporter_chart_version }}.tgz"
+    url: "{{ prometheus_node_exporter_chart_download_url }}"
+    unarchive: true
+    owner: "root"
+    mode: "0755"
+    groups:
+    - kube-master[0]
+
+  kube_state_metrics_chart:
+    enabled: "{{ prometheus_stack_enabled }}"
+    file: true
+    version: "{{ kube_state_metrics_chart_version }}"
+    dest: "{{local_release_dir}}/charts/kube-state-metrics-{{ kube_state_metrics_chart_version }}.tgz"
+    url: "{{ kube_state_metrics_chart_download_url }}"
+    unarchive: true
+    owner: "root"
+    mode: "0755"
+    groups:
+    - kube-master[0]
+
+  grafana_chart:
+    enabled: "{{ prometheus_stack_enabled }}"
+    file: true
+    version: "{{ grafana_chart_version }}"
+    dest: "{{local_release_dir}}/charts/grafana-{{ grafana_chart_version }}.tgz"
+    url: "{{ grafana_chart_download_url }}"
+    unarchive: true
+    owner: "root"
+    mode: "0755"
+    groups:
+    - kube-master[0]
 
 download_defaults:
   container: false

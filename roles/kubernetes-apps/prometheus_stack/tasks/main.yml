@@ -1,0 +1,27 @@
+---
+
+- name: Prometheus Stack | Copy Chart.yaml
+  template:
+    src: "kube-prometheus-stack_chart.yaml.j2"
+    dest: "{{local_release_dir}}/charts/kube-prometheus-stack/Chart.yaml"
+  register: prometheus_stack_chart
+  when:
+    - inventory_hostname == groups['kube-master'][0]
+
+- name: Prometheus Stack | Copy values.yaml
+  template:
+    src: "kube-prometheus-stack_values.yaml.j2"
+    dest: "{{local_release_dir}}/charts/kube-prometheus-stack/values.yaml"
+  register: prometheus_stack_chart
+  when:
+    - inventory_hostname == groups['kube-master'][0]
+
+
+- name: Prometheus Stack | Install chart
+  command: >-
+    helm upgrade prometheus_stack ./kube-prometheus-stack --install ----create-namespace --namespace {{ prometheus_stack_namespace }}
+  args:
+    chdir: {{local_release_dir}}/charts/
+  delegate_to: "{{ groups['kube-master'][0] }}"
+  run_once: true
+  register: prometheus_stack_chart_install

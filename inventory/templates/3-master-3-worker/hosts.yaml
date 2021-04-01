@@ -1,4 +1,6 @@
 all:
+  vars:
+    external_domain_name: "www.test.com"
   hosts:
     localhost:
       ansible_connection: local
