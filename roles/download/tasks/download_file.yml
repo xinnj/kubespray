@@ -101,7 +101,7 @@
     - download_force_cache
 
   - name: "download_file | Extract file archives"
-    include_tasks: "extract_file.yml"
+    include_tasks: "{{ playbook_dir }}/roles/download/tasks/extract_file.yml"
 
   tags:
   - download

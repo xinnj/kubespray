@@ -1,27 +1,39 @@
 ---
 
+- name: Prometheus Stack | Download
+  include_tasks: "{{ playbook_dir }}/roles/download/tasks/download_file.yml"
+  vars:
+    download: "{{ download_defaults | combine(downloads.prometheus_stack_bundle_chart) }}"
+
 - name: Prometheus Stack | Copy Chart.yaml
   template:
+    variable_start_string: "<<"
+    variable_end_string: ">>"
     src: "kube-prometheus-stack_chart.yaml.j2"
     dest: "{{local_release_dir}}/charts/kube-prometheus-stack/Chart.yaml"
+    backup: yes
   register: prometheus_stack_chart
   when:
     - inventory_hostname == groups['kube-master'][0]
 
-- name: Prometheus Stack | Copy values.yaml
+- name: Prometheus Stack | Render values.yaml
   template:
+    variable_start_string: "<<"
+    variable_end_string: ">>"
     src: "kube-prometheus-stack_values.yaml.j2"
     dest: "{{local_release_dir}}/charts/kube-prometheus-stack/values.yaml"
-  register: prometheus_stack_chart
+    backup: yes
+  register: prometheus_stack_values
   when:
     - inventory_hostname == groups['kube-master'][0]
 
 
 - name: Prometheus Stack | Install chart
-  command: >-
-    helm upgrade prometheus_stack ./kube-prometheus-stack --install ----create-namespace --namespace {{ prometheus_stack_namespace }}
+  command: >
+    helm upgrade prometheus-stack ./kube-prometheus-stack --install --wait --wait-for-jobs
+    --create-namespace --namespace {{ prometheus_stack_namespace }}
   args:
-    chdir: {{local_release_dir}}/charts/
+    chdir: "{{local_release_dir}}/charts"
   delegate_to: "{{ groups['kube-master'][0] }}"
   run_once: true
   register: prometheus_stack_chart_install

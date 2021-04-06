@@ -1,4 +1,4 @@
 ---
 ## set labels for om nodes
 node_labels:
-  om.surpass: true
+  om.surpass: "true"

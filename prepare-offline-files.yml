@@ -6,10 +6,10 @@
 #      file:
 #        state: absent
 #        path: /tmp/kubespray_cache
-    - name: Copy cached files
-      copy:
-        src: ../kubespray_cache
-        dest: /tmp/
+#    - name: Copy cached files
+#      copy:
+#        src: ../kubespray_cache
+#        dest: /tmp/
 
 - hosts: k8s-cluster
   gather_facts: false

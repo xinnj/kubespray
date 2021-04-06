@@ -10,15 +10,15 @@ appVersion: 0.46.0
 dependencies:
   - condition: kubeStateMetrics.enabled
     name: kube-state-metrics
-    repository: file://{{local_release_dir}}/charts/kube-state-metrics
+    repository: file://../kube-state-metrics
     version: 2.13.*
   - condition: nodeExporter.enabled
     name: prometheus-node-exporter
-    repository: file://{{local_release_dir}}/charts/prometheus-node-exporter
+    repository: file://../prometheus-node-exporter
     version: 1.16.*
   - condition: grafana.enabled
     name: grafana
-    repository: file://{{local_release_dir}}/charts/grafana
+    repository: file://../grafana
     version: 6.6.*
 description: kube-prometheus-stack collects Kubernetes manifests, Grafana dashboards, and Prometheus rules combined with documentation and scripts to provide easy to operate end-to-end Kubernetes cluster monitoring with Prometheus using the Prometheus Operator.
 home: https://github.com/prometheus-operator/kube-prometheus

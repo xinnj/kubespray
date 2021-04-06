@@ -1,0 +1,7 @@
+---
+- hosts: all:!localhost
+  gather_facts: false
+  tasks:
+    - name: Set Timezone
+      timezone:
+        name: Asia/Shanghai

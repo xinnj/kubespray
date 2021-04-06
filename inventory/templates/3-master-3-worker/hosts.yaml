@@ -38,11 +38,7 @@ all:
       children:
         om:
         sg1:
-    etcd:
-      hosts: {}
     k8s-cluster:
       children:
         kube-master:
         kube-node:
-    calico-rr:
-      hosts: {}

@@ -104,3 +104,10 @@ dependencies:
       - inventory_hostname == groups['kube-master'][0]
     tags:
       - metallb
+
+  - role: kubernetes-apps/prometheus_stack
+    when:
+      - prometheus_stack_enabled
+      - inventory_hostname == groups['kube-master'][0]
+    tags:
+      - prometheus_stack

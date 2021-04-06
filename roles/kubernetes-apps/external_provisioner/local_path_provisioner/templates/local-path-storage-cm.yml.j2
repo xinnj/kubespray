@@ -56,4 +56,9 @@ data:
         spec:
           containers:
           - name: helper-pod
+{% if local_path_provisioner_helper_image_repo is defined %}
+            image: {{local_path_provisioner_helper_image_repo}}:{{local_path_provisioner_helper_image_tag}}
+{% else %}
             image: busybox
+{% endif %}
+            imagePullPolicy: IfNotPresent
