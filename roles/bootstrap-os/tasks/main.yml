@@ -98,3 +98,8 @@
     owner: root
     group: root
     mode: 0755
+
+# Install NFS Client
+- name: install nfs_client
+  import_tasks: nfs_client.yml
+  when: install_nfs_client|default(false)
