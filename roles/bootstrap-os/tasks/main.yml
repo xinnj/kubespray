@@ -100,6 +100,11 @@
     mode: 0755
 
 # Install NFS Client
-- name: install nfs_client
+- name: Install nfs_client
   import_tasks: nfs_client.yml
   when: install_nfs_client|default(false)
+
+# Set firewall rules
+- name: Set firewall rules
+  import_tasks: set_firewall_rules.yml
+  when: set_firewall_rules|default(true)
