@@ -6,7 +6,7 @@ DOWNLOAD_MIRROR="${DOWNLOAD_MIRROR:-true}"
 
 # Copy ``inventory/sample`` as ``inventory/mycluster``
 if [ -d "${base}/../inventory/mycluster" ]; then
-    rm -rf "${base}/../inventory/mycluster.bak"
+    sudo rm -rf "${base}/../inventory/mycluster.bak"
     mv "${base}/../inventory/mycluster" "${base}/../inventory/mycluster.bak"
 fi
 cp -rfp "${base}/../inventory/sample" "${base}/../inventory/mycluster"
