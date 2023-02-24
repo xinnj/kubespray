@@ -103,3 +103,6 @@
 # containerd_ubuntu_repo_base_url: "{{ ubuntu_repo }}/containerd"
 # containerd_ubuntu_repo_gpgkey: "{{ ubuntu_repo }}/containerd/gpg"
 # containerd_ubuntu_repo_repokey: 'YOURREPOKEY'
+
+# [Optional] krew: only if you set krew_enabled: true
+# krew_download_url: "{{ files_repo }}/github.com/kubernetes-sigs/krew/releases/download/{{ krew_version }}/krew-{{ host_os }}_{{ image_arch }}.tar.gz"
