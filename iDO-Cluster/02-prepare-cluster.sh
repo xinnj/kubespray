@@ -2,14 +2,19 @@
 set -euao pipefail
 base=$(dirname "$0")
 
-DOWNLOAD_MIRROR="${DOWNLOAD_MIRROR:-true}"
-
-# Copy ``inventory/sample`` as ``inventory/mycluster``
-if [ -d "${base}/../inventory/mycluster" ]; then
-    sudo rm -rf "${base}/../inventory/mycluster.bak"
-    mv "${base}/../inventory/mycluster" "${base}/../inventory/mycluster.bak"
+if [ "$(/usr/bin/id -u)" != "0" ]; then
+    echo -e "Script must run as root or as sudoer."
+    exit 1
 fi
-cp -rfp "${base}/../inventory/sample" "${base}/../inventory/mycluster"
+
+DOWNLOAD_MIRROR="${DOWNLOAD_MIRROR:-false}"
+
+# Copy ``inventory/sample`` as ``inventory/idocluster``
+if [ -d "${base}/../inventory/idocluster" ]; then
+    rm -rf "${base}/../inventory/idocluster.bak"
+    mv "${base}/../inventory/idocluster" "${base}/../inventory/idocluster.bak"
+fi
+cp -rfp "${base}/../inventory/sample" "${base}/../inventory/idocluster"
 
 # Update Ansible inventory file with inventory builder
 confirm='n'
@@ -28,30 +33,23 @@ while [ "$confirm" != "y" ] && [ "$confirm" != "Y" ]; do
     fi
 done
 
-CONFIG_FILE="${base}/../inventory/mycluster/hosts.yaml"
+export CONFIG_FILE="${base}/../inventory/idocluster/hosts.yaml"
 python3 "${base}/../contrib/inventory_builder/inventory.py" "${IPS[@]}"
 
 # Generate ssh key
-if [ -e "${base}/../inventory/mycluster/ansible-key" ] && [ -e "${base}/../inventory/mycluster/ansible-key.pub" ]; then
-    echo Find existing SSH key: "${base}/../inventory/mycluster/ansible-key"
-    echo Do you want to use the existing one, or generate a new one?
-    read -p 'use existing (y), generate new (n): ' -r use_existing_key
-    if [ "$use_existing_key" != "y" ] && [ "$use_existing_key" != "Y" ]; then
-        ssh-keygen -q -N '' -f "${base}/../inventory/mycluster/ansible-key"
-    fi
-else
-    ssh-keygen -q -N '' -f "${base}/../inventory/mycluster/ansible-key"
-fi
+ssh-keygen -q -N '' -f "${base}/../inventory/idocluster/ansible-key"
 
+echo "------------------------------------------------------------------"
+read -p "Input root password on each host: " -r USERPASS
 for ip in "${IPS[@]}"; do
-    sudo ssh-copy-id -i "${base}/../inventory/mycluster/ansible-key" -f -p 22 root@${ip}
+    echo "$USERPASS" | sshpass ssh-copy-id -i "${base}/../inventory/idocluster/ansible-key" -o StrictHostKeyChecking=no -p 22 root@${ip}
 done
 
 # Use the download mirror
 if [ "$DOWNLOAD_MIRROR" == "true" ]; then
-    cp -f "${base}/../inventory/mycluster/group_vars/all/offline.yml" "${base}/../inventory/mycluster/group_vars/all/mirror.yml"
-    sed -i -E '/# .*\{\{ files_repo/s/^# //g' "${base}/../inventory/mycluster/group_vars/all/mirror.yml"
-    tee -a "${base}/../inventory/mycluster/group_vars/all/mirror.yml" <<EOF
+    cp -f "${base}/../inventory/idocluster/group_vars/all/offline.yml" "${base}/../inventory/idocluster/group_vars/all/mirror.yml"
+    sed -i -E '/# .*\{\{ files_repo/s/^# //g' "${base}/../inventory/idocluster/group_vars/all/mirror.yml"
+    tee -a "${base}/../inventory/idocluster/group_vars/all/mirror.yml" <<EOF
 gcr_image_repo: "gcr.m.daocloud.io"
 kube_image_repo: "k8s.m.daocloud.io"
 docker_image_repo: "docker.m.daocloud.io"
