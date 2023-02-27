@@ -48,7 +48,10 @@ function add_control_node() {
         "${base}/../upgrade-cluster.yml" | tee upgrade-cluster.log
 
     /usr/local/bin/ansible -i "${CONFIG_FILE}" -u root --private-key="${base}/../inventory/idocluster/ansible-key" \
-        k8s_cluster -m shell -a "nerdctl ps | grep k8s_nginx-proxy_nginx-proxy | awk '{print \$1}' | xargs -r nerdctl restart"
+        k8s_cluster -m shell -a "kubectl get pod -n kube-system | grep nginx-proxy | awk '{print \$1}' | xargs -r kubectl delete pod -n kube-system"
+
+    /usr/local/bin/ansible -i "${CONFIG_FILE}" -u root --private-key="${base}/../inventory/idocluster/ansible-key" \
+        kube_control_plane[0] -m shell -a "kubectl delete pod --all -n ingress-nginx"
 }
 
 function add_work_node() {
@@ -68,6 +71,12 @@ function add_work_node() {
         -e "{set_firewall_rules: True}" \
         --limit="${work_node}" \
         "${base}/../scale.yml" | tee scale-cluster.log
+
+    /usr/local/bin/ansible -i "${CONFIG_FILE}" -u root --private-key="${base}/../inventory/idocluster/ansible-key" \
+        kube_control_plane[0] -m shell -a "kubectl get pod -n kube-system | grep nginx-proxy | awk '{print \$1}' | xargs -r kubectl delete pod -n kube-system"
+
+    /usr/local/bin/ansible -i "${CONFIG_FILE}" -u root --private-key="${base}/../inventory/idocluster/ansible-key" \
+        kube_control_plane[0] -m shell -a "kubectl delete pod --all -n ingress-nginx"
 }
 
 # Get original hosts
