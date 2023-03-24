@@ -24,4 +24,6 @@ fi
 -e "{krew_enabled: True}" \
 -e "{install_nfs_client: True}" \
 -e "{set_firewall_rules: True}" \
+-e "{install_qemu: True}" \
+-e "{containerd_insecure_registries: {'nexus-nexus-repository-manager-docker-5000.nexus:5000': 'http://nexus-nexus-repository-manager-docker-5000.nexus:5000'}}" \
 "${base}/../cluster.yml" | tee setup-cluster.log

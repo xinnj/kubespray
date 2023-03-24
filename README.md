@@ -4,6 +4,7 @@
 
 - Add necessary firewall rules when variable `set_firewall_rules` is true.
 - Install NFS client for NFS provisioner when variable `install_nfs_client` is true.
+- Install QEMU when variable `install_qemu` is true.
 - Offer a serial of scripts to help create / maintain k8s cluster.
 - Enable download mirror to make the public resources download quickly in some areas of the world (such as China), 
 when set system environment `export DOWNLOAD_MIRROR=true` 

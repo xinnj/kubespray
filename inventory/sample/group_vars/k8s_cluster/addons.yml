@@ -229,3 +229,6 @@ krew_root_dir: "/usr/local/krew"
 
 # Install NFS Client
 install_nfs_client: false
+
+# Install QEMU
+install_qemu: false

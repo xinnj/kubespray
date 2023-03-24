@@ -29,6 +29,8 @@ function add_control_node() {
         -e "{krew_enabled: True}" \
         -e "{install_nfs_client: True}" \
         -e "{set_firewall_rules: True}" \
+        -e "{install_qemu: True}" \
+        -e "{containerd_insecure_registries: {'nexus-nexus-repository-manager-docker-5000.nexus:5000': 'http://nexus-nexus-repository-manager-docker-5000.nexus:5000'}}" \
         --limit=etcd,kube_control_plane -e ignore_assert_errors=yes -e etcd_retries=10 \
         --skip-tags=multus \
         "${base}/../cluster.yml" | tee setup-cluster.log
@@ -43,6 +45,8 @@ function add_control_node() {
         -e "{krew_enabled: True}" \
         -e "{install_nfs_client: True}" \
         -e "{set_firewall_rules: True}" \
+        -e "{install_qemu: True}" \
+        -e "{containerd_insecure_registries: {'nexus-nexus-repository-manager-docker-5000.nexus:5000': 'http://nexus-nexus-repository-manager-docker-5000.nexus:5000'}}" \
         --limit=etcd,kube_control_plane -e ignore_assert_errors=yes -e etcd_retries=10 \
         --skip-tags=multus \
         "${base}/../upgrade-cluster.yml" | tee upgrade-cluster.log
@@ -69,6 +73,8 @@ function add_work_node() {
         -e "{krew_enabled: True}" \
         -e "{install_nfs_client: True}" \
         -e "{set_firewall_rules: True}" \
+        -e "{install_qemu: True}" \
+        -e "{containerd_insecure_registries: {'nexus-nexus-repository-manager-docker-5000.nexus:5000': 'http://nexus-nexus-repository-manager-docker-5000.nexus:5000'}}" \
         --limit="${work_node}" \
         "${base}/../scale.yml" | tee scale-cluster.log
 

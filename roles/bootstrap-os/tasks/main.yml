@@ -108,3 +108,8 @@
 - name: Set firewall rules
   import_tasks: set_firewall_rules.yml
   when: set_firewall_rules|default(true)
+
+# Install QEMU
+- name: Install QEMU
+  import_tasks: qemu.yml
+  when: install_qemu|default(false)
