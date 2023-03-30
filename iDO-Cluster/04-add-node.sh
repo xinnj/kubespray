@@ -50,12 +50,6 @@ function add_control_node() {
         --limit=etcd,kube_control_plane -e ignore_assert_errors=yes -e etcd_retries=10 \
         --skip-tags=multus \
         "${base}/../upgrade-cluster.yml" | tee upgrade-cluster.log
-
-    /usr/local/bin/ansible -i "${CONFIG_FILE}" -u root --private-key="${base}/../inventory/idocluster/ansible-key" \
-        k8s_cluster -m shell -a "kubectl get pod -n kube-system | grep nginx-proxy | awk '{print \$1}' | xargs -r kubectl delete pod -n kube-system"
-
-    /usr/local/bin/ansible -i "${CONFIG_FILE}" -u root --private-key="${base}/../inventory/idocluster/ansible-key" \
-        kube_control_plane[0] -m shell -a "kubectl delete pod --all -n ingress-nginx"
 }
 
 function add_work_node() {
@@ -77,12 +71,6 @@ function add_work_node() {
         -e "{containerd_insecure_registries: {'nexus-nexus-repository-manager-docker-5000.nexus:5000': 'http://nexus-nexus-repository-manager-docker-5000.nexus:5000'}}" \
         --limit="${work_node}" \
         "${base}/../scale.yml" | tee scale-cluster.log
-
-    /usr/local/bin/ansible -i "${CONFIG_FILE}" -u root --private-key="${base}/../inventory/idocluster/ansible-key" \
-        kube_control_plane[0] -m shell -a "kubectl get pod -n kube-system | grep nginx-proxy | awk '{print \$1}' | xargs -r kubectl delete pod -n kube-system"
-
-    /usr/local/bin/ansible -i "${CONFIG_FILE}" -u root --private-key="${base}/../inventory/idocluster/ansible-key" \
-        kube_control_plane[0] -m shell -a "kubectl delete pod --all -n ingress-nginx"
 }
 
 # Get original hosts
@@ -159,5 +147,17 @@ if [ $original_hosts_num -ge 3 ]; then
     echo "work_node: ${work_node}"
     add_work_node
 fi
+
+# Set firewall rules for all nodes
+/usr/local/bin/ansible -i "${CONFIG_FILE}" -u root --private-key="${base}/../inventory/idocluster/ansible-key" \
+    k8s_cluster --module-name include_role --args name=firewall-rules
+
+# Restart all nginx-proxy
+/usr/local/bin/ansible -i "${CONFIG_FILE}" -u root --private-key="${base}/../inventory/idocluster/ansible-key" \
+    kube_control_plane[0] -m shell -a "kubectl get pod -n kube-system | grep nginx-proxy | awk '{print \$1}' | xargs -r kubectl delete pod -n kube-system"
+
+# Restart all nginx ingress controller
+/usr/local/bin/ansible -i "${CONFIG_FILE}" -u root --private-key="${base}/../inventory/idocluster/ansible-key" \
+    kube_control_plane[0] -m shell -a "kubectl delete pod --all -n ingress-nginx"
 
 rm -f "${CONFIG_FILE}.original"

@@ -104,12 +104,13 @@
   import_tasks: nfs_client.yml
   when: install_nfs_client|default(false)
 
-# Set firewall rules
-- name: Set firewall rules
-  import_tasks: set_firewall_rules.yml
-  when: set_firewall_rules|default(true)
-
 # Install QEMU
 - name: Install QEMU
   import_tasks: qemu.yml
   when: install_qemu|default(false)
+
+# Set firewall rules
+- name: Set firewall rules
+  include_role:
+    name: firewall-rules
+  when: set_firewall_rules|default(true)

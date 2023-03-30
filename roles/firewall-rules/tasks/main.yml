@@ -1,4 +1,9 @@
 ---
+- name: Gather host facts to get ansible_os_family
+  setup:
+    gather_subset: '!all'
+    filter: ansible_*
+
 - name: get service facts
   ansible.builtin.service_facts:
 
