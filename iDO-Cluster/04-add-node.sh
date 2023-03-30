@@ -153,7 +153,7 @@ fi
 
 # Set firewall rules for all nodes
 /usr/local/bin/ansible -i "${CONFIG_FILE}" -u root --private-key="${base}/../inventory/idocluster/ansible-key" \
-    k8s_cluster --module-name include_role --args name=firewall-rules
+    k8s_cluster --module-name include_role --args name="../roles/firewall-rules"
 
 # Restart all nginx-proxy
 /usr/local/bin/ansible -i "${CONFIG_FILE}" -u root --private-key="${base}/../inventory/idocluster/ansible-key" \
