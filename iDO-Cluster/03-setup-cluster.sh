@@ -26,4 +26,5 @@ fi
 -e "{set_firewall_rules: True}" \
 -e "{install_qemu: True}" \
 -e "{containerd_insecure_registries: {'nexus-nexus-repository-manager-docker-5000.nexus:5000': 'http://nexus-nexus-repository-manager-docker-5000.nexus:5000'}}" \
+-e calico_vxlan_mode="CrossSubnet" \
 "${base}/../cluster.yml" | tee setup-cluster.log
