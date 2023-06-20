@@ -9,7 +9,7 @@
 
 - name: Set rules for 'RedHat' family - public
   ansible.builtin.shell:
-    cmd: "firewall-cmd --permanent --zone=public --add-service=http --add-service=https"
+    cmd: "firewall-cmd --permanent --zone=public --add-service=http --add-service=https --add-port={{ kube_apiserver_node_port_range }}/{tcp,udp}"
   when: ansible_facts.services["firewalld.service"]['state'] == 'running'
 
 - name: Set rules for 'RedHat' family - internal subset
@@ -33,7 +33,7 @@
 
 - name: Set rules for 'Debian' family - public
   ansible.builtin.shell:
-    cmd: "ufw allow http && ufw allow https"
+    cmd: "ufw allow http && ufw allow https && ufw allow {{ kube_apiserver_node_port_range | replace('-',':') }}/tcp && ufw allow {{ kube_apiserver_node_port_range | replace('-',':') }}/udp"
   when: "ansible_os_family == 'Debian'"
 
 - name: Set rules for 'Debian' family - internal subset
