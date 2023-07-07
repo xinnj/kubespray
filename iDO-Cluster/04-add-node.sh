@@ -30,7 +30,7 @@ function add_control_node() {
         -e "{install_nfs_client: True}" \
         -e "{set_firewall_rules: True}" \
         -e "{install_qemu: True}" \
-        -e "{containerd_insecure_registries: {'nexus-nexus-repository-manager-docker-5000.nexus:5000': 'http://nexus-nexus-repository-manager-docker-5000.nexus:5000'}}" \
+        -e "{containerd_insecure_registries: {'nexus-docker-5000:5000': 'http://nexus-docker-5000:5000'}}" \
         -e calico_vxlan_mode="CrossSubnet" \
         --limit=etcd,kube_control_plane -e ignore_assert_errors=yes -e etcd_retries=10 \
         --skip-tags=multus \
@@ -47,7 +47,7 @@ function add_control_node() {
         -e "{install_nfs_client: True}" \
         -e "{set_firewall_rules: True}" \
         -e "{install_qemu: True}" \
-        -e "{containerd_insecure_registries: {'nexus-nexus-repository-manager-docker-5000.nexus:5000': 'http://nexus-nexus-repository-manager-docker-5000.nexus:5000'}}" \
+        -e "{containerd_insecure_registries: {'nexus-docker-5000:5000': 'http://nexus-docker-5000:5000'}}" \
         -e calico_vxlan_mode="CrossSubnet" \
         --limit=etcd,kube_control_plane -e ignore_assert_errors=yes -e etcd_retries=10 \
         --skip-tags=multus \
@@ -70,7 +70,7 @@ function add_work_node() {
         -e "{install_nfs_client: True}" \
         -e "{set_firewall_rules: True}" \
         -e "{install_qemu: True}" \
-        -e "{containerd_insecure_registries: {'nexus-nexus-repository-manager-docker-5000.nexus:5000': 'http://nexus-nexus-repository-manager-docker-5000.nexus:5000'}}" \
+        -e "{containerd_insecure_registries: {'nexus-docker-5000:5000': 'http://nexus-docker-5000:5000'}}" \
         -e calico_vxlan_mode="CrossSubnet" \
         --limit="${work_node}" \
         "${base}/../scale.yml" | tee scale-cluster.log
