@@ -7,9 +7,14 @@
 - name: get service facts
   ansible.builtin.service_facts:
 
-- name: Set rules for 'RedHat' family - public
+- name: Set rules for 'RedHat' family - public service
   ansible.builtin.shell:
-    cmd: "firewall-cmd --permanent --zone=public --add-service=http --add-service=https --add-port={{ kube_apiserver_node_port_range }}/{tcp,udp}"
+    cmd: "firewall-cmd --permanent --zone=public --add-service=http --add-service=https"
+  when: ansible_facts.services["firewalld.service"]['state'] == 'running'
+
+- name: Set rules for 'RedHat' family - public port
+  ansible.builtin.shell:
+    cmd: "firewall-cmd --permanent --zone=public --add-port={{ kube_apiserver_node_port_range }}/{tcp,udp}"
   when: ansible_facts.services["firewalld.service"]['state'] == 'running'
 
 - name: Set rules for 'RedHat' family - internal subset

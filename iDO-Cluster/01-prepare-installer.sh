@@ -1,6 +1,6 @@
 #! /bin/bash
 set -euao pipefail
-base=$(dirname "$0")
+base=$(dirname $(realpath "$0"))
 
 if [ "$(/usr/bin/id -u)" != "0" ]; then
   echo -e "Script must run as root or as sudoer."
@@ -8,6 +8,7 @@ if [ "$(/usr/bin/id -u)" != "0" ]; then
 fi
 
 DOWNLOAD_MIRROR="${DOWNLOAD_MIRROR:-false}"
+echo DOWNLOAD_MIRROR=${DOWNLOAD_MIRROR}
 
 yum install -y python3-pip podman podman-docker sshpass
 touch /etc/containers/nodocker

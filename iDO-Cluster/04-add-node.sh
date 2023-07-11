@@ -1,6 +1,6 @@
 #! /bin/bash
 set -euao pipefail
-base=$(dirname "$0")
+base=$(dirname $(realpath "$0"))
 
 if [ "$(/usr/bin/id -u)" != "0" ]; then
   echo -e "Script must run as root or as sudoer."
@@ -17,41 +17,22 @@ if [ -f "${CONFIG_FILE}.original" ]; then
     mv -f "${CONFIG_FILE}.original" "${CONFIG_FILE}"
 fi
 
+export ANSIBLE_ROLES_PATH="${base}/../roles"
+mkdir -p "${base}/logs"
+
 function add_control_node() {
     # add control plane / etcd node
     /usr/local/bin/ansible-playbook -i "${CONFIG_FILE}" -u root --private-key="${base}/../inventory/idocluster/ansible-key" \
-        -e "{download_run_once: True}" -e "{download_localhost: True}" -e "{download_force_cache: True}" \
-        -e "{download_keep_remote_cache: False}" -e download_cache_dir="/tmp/ido-cluster-cache" \
-        -e container_manager_on_localhost="docker" -e image_command_tool_on_localhost="docker" \
-        -e "{helm_enabled: True}" \
-        -e "{ingress_nginx_enabled: True}" \
-        -e "{metrics_server_enabled: True}" \
-        -e "{krew_enabled: True}" \
-        -e "{install_nfs_client: True}" \
-        -e "{set_firewall_rules: True}" \
-        -e "{install_qemu: True}" \
-        -e "{containerd_insecure_registries: {'nexus-docker-5000:5000': 'http://nexus-docker-5000:5000'}}" \
-        -e calico_vxlan_mode="CrossSubnet" \
+        -e @"${base}/.parameters" \
         --limit=etcd,kube_control_plane -e ignore_assert_errors=yes -e etcd_retries=10 \
         --skip-tags=multus \
-        "${base}/../cluster.yml" | tee setup-cluster.log
+        "${base}/../cluster.yml" | tee "${base}/logs/add-control-node.log"
 
     /usr/local/bin/ansible-playbook -i "${CONFIG_FILE}" -u root --private-key="${base}/../inventory/idocluster/ansible-key" \
-        -e "{download_run_once: True}" -e "{download_localhost: True}" -e "{download_force_cache: True}" \
-        -e "{download_keep_remote_cache: False}" -e download_cache_dir="/tmp/ido-cluster-cache" \
-        -e container_manager_on_localhost="docker" -e image_command_tool_on_localhost="docker" \
-        -e "{helm_enabled: True}" \
-        -e "{ingress_nginx_enabled: True}" \
-        -e "{metrics_server_enabled: True}" \
-        -e "{krew_enabled: True}" \
-        -e "{install_nfs_client: True}" \
-        -e "{set_firewall_rules: True}" \
-        -e "{install_qemu: True}" \
-        -e "{containerd_insecure_registries: {'nexus-docker-5000:5000': 'http://nexus-docker-5000:5000'}}" \
-        -e calico_vxlan_mode="CrossSubnet" \
+        -e @"${base}/.parameters" \
         --limit=etcd,kube_control_plane -e ignore_assert_errors=yes -e etcd_retries=10 \
         --skip-tags=multus \
-        "${base}/../upgrade-cluster.yml" | tee upgrade-cluster.log
+        "${base}/../upgrade-cluster.yml" | tee "${base}/logs/add-control-node.log"
 }
 
 function add_work_node() {
@@ -60,20 +41,9 @@ function add_work_node() {
         "${base}/../facts.yml"
 
     /usr/local/bin/ansible-playbook -i "${CONFIG_FILE}" -u root --private-key="${base}/../inventory/idocluster/ansible-key" \
-        -e "{download_run_once: True}" -e "{download_localhost: True}" -e "{download_force_cache: True}" \
-        -e "{download_keep_remote_cache: False}" -e download_cache_dir="/tmp/cache" \
-        -e container_manager_on_localhost="docker" -e image_command_tool_on_localhost="docker" \
-        -e "{helm_enabled: True}" \
-        -e "{ingress_nginx_enabled: True}" \
-        -e "{metrics_server_enabled: True}" \
-        -e "{krew_enabled: True}" \
-        -e "{install_nfs_client: True}" \
-        -e "{set_firewall_rules: True}" \
-        -e "{install_qemu: True}" \
-        -e "{containerd_insecure_registries: {'nexus-docker-5000:5000': 'http://nexus-docker-5000:5000'}}" \
-        -e calico_vxlan_mode="CrossSubnet" \
+        -e @"${base}/.parameters" \
         --limit="${work_node}" \
-        "${base}/../scale.yml" | tee scale-cluster.log
+        "${base}/../scale.yml" | tee "${base}/logs/add-work-node.log"
 }
 
 # Get original hosts
@@ -153,7 +123,7 @@ fi
 
 # Set firewall rules for all nodes
 /usr/local/bin/ansible -i "${CONFIG_FILE}" -u root --private-key="${base}/../inventory/idocluster/ansible-key" \
-    k8s_cluster --module-name include_role --args name="../roles/firewall-rules"
+    k8s_cluster --module-name include_role --args name="${base}/../roles/firewall-rules"
 
 # Restart all nginx-proxy
 /usr/local/bin/ansible -i "${CONFIG_FILE}" -u root --private-key="${base}/../inventory/idocluster/ansible-key" \

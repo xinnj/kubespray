@@ -28,6 +28,10 @@ loadbalancer_apiserver_port: 6443
 ## If loadbalancer_apiserver_healthcheck_port variable defined, enables proxy liveness check for nginx.
 loadbalancer_apiserver_healthcheck_port: 8081
 
+loadbalancer_apiserver:
+  address: "{{ kube_vip_address }}"
+  port: 6443
+
 ### OTHER OPTIONAL VARIABLES
 
 ## By default, Kubespray collects nameservers on the host. It then adds the previously collected nameservers in nameserverentries.
