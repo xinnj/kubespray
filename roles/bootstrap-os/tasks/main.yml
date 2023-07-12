@@ -99,18 +99,23 @@
     group: root
     mode: 0755
 
-# Install NFS Client
-- name: Install nfs_client
-  import_tasks: nfs_client.yml
-  when: install_nfs_client|default(false)
-
-# Install QEMU
-- name: Install QEMU
-  import_tasks: qemu.yml
-  when: install_qemu|default(false)
-
 # Set firewall rules
 - name: Set firewall rules
   include_role:
     name: firewall-rules
   when: set_firewall_rules|default(true)
+
+# Install NFS Client
+- name: Install nfs_client
+  include_role:
+    name: install-nfs-client
+  when: install_nfs_client|default(false)
+
+# Install QEMU
+- name: Install QEMU
+  include_role:
+    name: install-qemu
+  when:
+    - install_qemu|default(false)
+    - node_labels['vm-agent'] is defined
+    - node_labels['vm-agent'] | bool

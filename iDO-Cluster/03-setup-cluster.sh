@@ -9,14 +9,15 @@ fi
 
 export CONFIG_FILE="${base}/../inventory/idocluster/hosts.yaml"
 if ! [ -f "${CONFIG_FILE}" ]; then
-    echo -e "Can't find inventory file: ${CONFIG_FILE}"
-    exit 1
+  echo -e "Can't find inventory file: ${CONFIG_FILE}"
+  exit 1
 fi
 
 export ANSIBLE_ROLES_PATH="${base}/../roles"
+export ANSIBLE_LIBRARY="${base}/../library"
 mkdir -p "${base}/logs"
 
 # Setup cluster
 /usr/local/bin/ansible-playbook -i "${CONFIG_FILE}" -u root --private-key="${base}/../inventory/idocluster/ansible-key" \
   -e @"${base}/.parameters" \
-  "${base}/../cluster.yml" | tee "${base}/logs/setup-cluster.log"
+  "${base}/../playbooks/cluster.yml" | tee "${base}/logs/setup-cluster.log"

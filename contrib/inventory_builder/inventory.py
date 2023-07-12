@@ -246,7 +246,9 @@ class KubesprayInventory(object):
                 # in case we dont provide it.
                 all_hosts[next_host] = {'ansible_host': access_ip,
                                         'ip': ip,
-                                        'access_ip': access_ip}
+                                        'access_ip': access_ip,
+                                        'node_labels': {'vm-agent': False}
+                                        }
             # Host/Argument starts with a letter, then we assume its a hostname
             elif host[0].isalpha():
                 if ',' in host:
@@ -263,7 +265,9 @@ class KubesprayInventory(object):
                     continue
                 all_hosts[hostname] = {'ansible_host': access_ip,
                                        'ip': ip,
-                                       'access_ip': access_ip}
+                                       'access_ip': access_ip,
+                                       'node_labels': {'vm-agent': False}
+                                       }
         return all_hosts
 
     # Expand IP ranges into individual addresses
