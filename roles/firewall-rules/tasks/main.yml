@@ -14,7 +14,8 @@
 
 - name: Set rules for 'RedHat' family - public port
   ansible.builtin.shell:
-    cmd: "firewall-cmd --permanent --zone=public --add-port={{ kube_apiserver_node_port_range }}/{tcp,udp}"
+    cmd: "firewall-cmd --permanent --zone=public --add-port={{ kube_apiserver_node_port_range }}/{tcp,udp}
+      --add-port={{ loadbalancer_apiserver_port }}/tcp"
   when: ansible_facts.services["firewalld.service"]['state'] == 'running'
 
 - name: Set rules for 'RedHat' family - internal subset
@@ -27,7 +28,8 @@
 
 - name: Set rules for 'RedHat' family - hosts
   ansible.builtin.shell:
-    cmd: "firewall-cmd --permanent --zone=trusted --add-source={{ hostvars[item]['ip'] if hostvars[item]['ip'] is defined else hostvars[item]['ansible_host'] }}"
+    cmd: "firewall-cmd --permanent --zone=trusted
+      --add-source={{ hostvars[item]['ip'] if hostvars[item]['ip'] is defined else hostvars[item]['ansible_host'] }}"
   when: ansible_facts.services["firewalld.service"]['state'] == 'running'
   with_items: "{{ groups['all'] }}"
 
@@ -38,7 +40,10 @@
 
 - name: Set rules for 'Debian' family - public
   ansible.builtin.shell:
-    cmd: "ufw allow http && ufw allow https && ufw allow {{ kube_apiserver_node_port_range | replace('-',':') }}/tcp && ufw allow {{ kube_apiserver_node_port_range | replace('-',':') }}/udp"
+    cmd: "ufw allow http && ufw allow https
+      && ufw allow {{ kube_apiserver_node_port_range | replace('-',':') }}/tcp
+      && ufw allow {{ kube_apiserver_node_port_range | replace('-',':') }}/udp
+      && ufw allow {{ loadbalancer_apiserver_port }}/tcp"
   when: "ansible_os_family == 'Debian'"
 
 - name: Set rules for 'Debian' family - internal subset
